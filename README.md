@@ -5,17 +5,6 @@
 
 ---
 
-## Table of Contents
-
-1. [API Design Overview](#1-api-design-overview)
-2. [Project Structure](#2-project-structure)
-3. [Technology Stack](#3-technology-stack)
-4. [How to Build & Run](#4-how-to-build--run)
-5. [Sample curl Commands](#5-sample-curl-commands)
-6. [Endpoint Reference](#6-endpoint-reference)
-7. [Report – Question Answers](#7-report--question-answers)
-
----
 
 ## 1. API Design Overview
 
@@ -83,48 +72,7 @@ The **Smart Campus API** is a fully RESTful web service that enables campus faci
 }
 ```
 
----
-
-## 2. Project Structure
-
-```
-SmartCampusAPI/
-├── pom.xml
-└── src/
-    └── main/
-        ├── java/
-        │   └── com/smartcampus/
-        │       ├── SmartCampusApplication.java   ← JAX-RS Application entry point (@ApplicationPath)
-        │       ├── DataStore.java                ← Enum singleton (in-memory ConcurrentHashMap store)
-        │       ├── model/
-        │       │   ├── Room.java
-        │       │   ├── Sensor.java
-        │       │   ├── SensorReading.java
-        │       │   └── ApiError.java
-        │       ├── resource/
-        │       │   ├── DiscoveryResource.java     ← GET /api/v1
-        │       │   ├── RoomResource.java          ← /api/v1/rooms
-        │       │   ├── SensorResource.java        ← /api/v1/sensors
-        │       │   └── SensorReadingResource.java ← Sub-resource for readings
-        │       ├── exception/
-        │       │   ├── RoomNotEmptyException.java
-        │       │   ├── RoomNotEmptyExceptionMapper.java        ← 409 Conflict
-        │       │   ├── LinkedResourceNotFoundException.java
-        │       │   ├── LinkedResourceNotFoundExceptionMapper.java ← 422 Unprocessable
-        │       │   ├── SensorUnavailableException.java
-        │       │   ├── SensorUnavailableExceptionMapper.java   ← 403 Forbidden
-        │       │   └── GlobalExceptionMapper.java              ← 500 catch-all
-        │       └── filter/
-        │           └── ApiLoggingFilter.java      ← Request/Response logging
-        └── webapp/
-            └── WEB-INF/
-                ├── web.xml
-                └── beans.xml
-```
-
----
-
-## 3. Technology Stack
+## 2. Technology Stack
 
 | Component | Technology | Version |
 |---|---|---|
@@ -135,11 +83,10 @@ SmartCampusAPI/
 | Build Tool | Apache Maven | 3.x |
 | Data Storage | `ConcurrentHashMap` / `CopyOnWriteArrayList` (in-memory) | — |
 
-> **No database, no Spring Boot, no SQL** — as required by the coursework specification.
 
 ---
 
-## 4. How to Build & Run
+## 3. How to Build & Run
 
 ### Prerequisites
 
@@ -181,21 +128,6 @@ INFO: Starting ProtocolHandler ["http-nio-8080"]
 curl http://localhost:8080/api/v1
 ```
 
-Expected response:
-```json
-{
-  "api": "Smart Campus Sensor & Room Management API",
-  "version": "1.0.0",
-  "description": "RESTful API for managing campus rooms and IoT sensors.",
-  "contact": "admin@smartcampus.ac.uk",
-  "_links": {
-    "self": "/api/v1",
-    "rooms": "/api/v1/rooms",
-    "sensors": "/api/v1/sensors"
-  }
-}
-```
-
 ### Step 5 – Stop the Server
 
 Press `Ctrl + C` in the terminal.
@@ -207,7 +139,7 @@ Press `Ctrl + C` in the terminal.
 
 ---
 
-## 5. Sample curl Commands
+## 4. Sample curl Commands
 
 > **Base URL:** `http://localhost:8080/api/v1`  
 > All requests and responses use `Content-Type: application/json`.
@@ -221,22 +153,6 @@ curl -X GET http://localhost:8080/api/v1 \
      -H "Accept: application/json"
 ```
 
-**Expected Response (200 OK):**
-```json
-{
-  "api": "Smart Campus Sensor & Room Management API",
-  "version": "1.0.0",
-  "contact": "admin@smartcampus.ac.uk",
-  "_links": {
-    "self": "/api/v1",
-    "rooms": "/api/v1/rooms",
-    "sensors": "/api/v1/sensors"
-  }
-}
-```
-
----
-
 ### 2 – Create a Room (POST /api/v1/rooms)
 
 ```bash
@@ -245,35 +161,12 @@ curl -X POST http://localhost:8080/api/v1/rooms \
      -d '{"id":"LIB-301","name":"Library Quiet Study","capacity":50}'
 ```
 
-**Expected Response (201 Created):**
-```json
-{
-  "id": "LIB-301",
-  "name": "Library Quiet Study",
-  "capacity": 50,
-  "sensorIds": []
-}
-```
-
----
-
 ### 3 – Register a Sensor with roomId Validation (POST /api/v1/sensors)
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/sensors \
      -H "Content-Type: application/json" \
      -d '{"id":"TEMP-001","type":"Temperature","status":"ACTIVE","currentValue":21.5,"roomId":"LIB-301"}'
-```
-
-**Expected Response (201 Created):**
-```json
-{
-  "id": "TEMP-001",
-  "type": "Temperature",
-  "status": "ACTIVE",
-  "currentValue": 21.5,
-  "roomId": "LIB-301"
-}
 ```
 
 **Test 422 Unprocessable Entity (invalid roomId):**
@@ -292,19 +185,6 @@ curl -X GET "http://localhost:8080/api/v1/sensors?type=Temperature" \
      -H "Accept: application/json"
 ```
 
-**Expected Response (200 OK):**
-```json
-[
-  {
-    "id": "TEMP-001",
-    "type": "Temperature",
-    "status": "ACTIVE",
-    "currentValue": 21.5,
-    "roomId": "LIB-301"
-  }
-]
-```
-
 ---
 
 ### 5 – Post a Sensor Reading (POST /api/v1/sensors/{sensorId}/readings)
@@ -313,15 +193,6 @@ curl -X GET "http://localhost:8080/api/v1/sensors?type=Temperature" \
 curl -X POST http://localhost:8080/api/v1/sensors/TEMP-001/readings \
      -H "Content-Type: application/json" \
      -d '{"value":23.7}'
-```
-
-**Expected Response (201 Created):**
-```json
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "timestamp": 1713700000000,
-  "value": 23.7
-}
 ```
 
 ---
@@ -341,16 +212,6 @@ curl -X GET http://localhost:8080/api/v1/sensors/TEMP-001/readings \
 curl -X DELETE http://localhost:8080/api/v1/rooms/LIB-301
 ```
 
-**Expected Response (409 Conflict):**
-```json
-{
-  "status": 409,
-  "error": "Conflict",
-  "message": "Room 'LIB-301' cannot be deleted because it still has 1 sensor(s) assigned to it."
-}
-```
-
----
 
 ### 8 – Post Reading to a MAINTENANCE Sensor (403 Forbidden)
 
@@ -366,18 +227,9 @@ curl -X POST http://localhost:8080/api/v1/sensors/TEMP-001/readings \
      -d '{"value":22.0}'
 ```
 
-**Expected Response (403 Forbidden):**
-```json
-{
-  "status": 403,
-  "error": "Forbidden",
-  "message": "Sensor 'TEMP-001' is currently under MAINTENANCE and cannot accept new readings."
-}
-```
-
 ---
 
-## 6. Endpoint Reference
+## 5. Endpoint Reference
 
 | Method | Path | Description | Success Code |
 |--------|------|-------------|-------------|
@@ -408,9 +260,8 @@ curl -X POST http://localhost:8080/api/v1/sensors/TEMP-001/readings \
 
 ---
 
-## 7. Report – Question Answers
+## 6. Report – Question Answers
 
-> Written answers to all conceptual questions in the coursework specification.
 
 ---
 
