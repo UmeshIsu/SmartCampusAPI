@@ -72,21 +72,8 @@ The **Smart Campus API** is a fully RESTful web service that enables campus faci
 }
 ```
 
-## 2. Technology Stack
 
-| Component | Technology | Version |
-|---|---|---|
-| Language | Java | 11 |
-| REST Framework | JAX-RS via Jersey | 2.41 |
-| JSON Serialisation | Jackson (via jersey-media-json-jackson) | bundled |
-| Servlet Container | Tomcat (via tomcat7-maven-plugin) | 7.x (plugin) |
-| Build Tool | Apache Maven | 3.x |
-| Data Storage | `ConcurrentHashMap` / `CopyOnWriteArrayList` (in-memory) | — |
-
-
----
-
-## 3. How to Build & Run
+## 2. How to Build & Run
 
 ### Prerequisites
 
@@ -139,7 +126,7 @@ Press `Ctrl + C` in the terminal.
 
 ---
 
-## 4. Sample curl Commands
+## 3. Sample curl Commands
 
 > **Base URL:** `http://localhost:8080/api/v1`  
 > All requests and responses use `Content-Type: application/json`.
@@ -229,7 +216,7 @@ curl -X POST http://localhost:8080/api/v1/sensors/TEMP-001/readings \
 
 ---
 
-## 5. Endpoint Reference
+## 4. Endpoint Reference
 
 | Method | Path | Description | Success Code |
 |--------|------|-------------|-------------|
@@ -260,7 +247,7 @@ curl -X POST http://localhost:8080/api/v1/sensors/TEMP-001/readings \
 
 ---
 
-## 6. Report – Question Answers
+## 5. Report – Question Answers
 
 
 ---
