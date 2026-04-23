@@ -28,8 +28,6 @@ public class SmartCampusApplication extends Application {
         classes.add(LinkedResourceNotFoundExceptionMapper.class);
         classes.add(SensorUnavailableExceptionMapper.class);
         classes.add(GlobalExceptionMapper.class);
-
-
         classes.add(ApiLoggingFilter.class);
 
         return classes;
